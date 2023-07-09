@@ -28,6 +28,25 @@ export interface Env {
 
 export default {
   async fetch (request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    return new Response('Hello World!')
+    const upgradeHeader = request.headers.get('Upgrade')
+    if (upgradeHeader === null || upgradeHeader !== 'websocket') {
+      return new Response('Expected Upgrade: websocket', { status: 426 })
+    }
+
+    const webSocketPair = new WebSocketPair()
+    const [client, server] = Object.values(webSocketPair)
+
+    server.accept()
+    server.addEventListener('open', _ => { console.log('websocket open') })
+    server.addEventListener('close', _ => { console.log('websocket close') })
+    server.addEventListener('error', event => { console.log(event.error) })
+    server.addEventListener('message', event => {
+      console.log(event.data)
+    })
+
+    return new Response(null, {
+      status: 101,
+      webSocket: client
+    })
   }
 }
