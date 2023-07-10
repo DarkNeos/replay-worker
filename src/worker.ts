@@ -56,7 +56,7 @@ export default {
         }
 
         server.send(response)
-      }, 100)
+      }, 10)
     })
 
     // TODO: set websocket timeout
