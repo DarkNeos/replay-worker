@@ -49,7 +49,7 @@ export default {
       const responses = getResponses(replayData)
 
       const timeoutId = setInterval(() => {
-        const response = responses.pop()
+        const response = responses.shift()
         if (response == null) {
           // send response finished, close websocket
           server.close()
