@@ -8,6 +8,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import { getResponses } from './replay'
+
 /* eslint  @typescript-eslint/no-empty-interface: "off" */
 export interface Env {
   // Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
@@ -41,7 +43,22 @@ export default {
     server.addEventListener('close', _ => { console.log('websocket close') })
     server.addEventListener('error', event => { console.log(event.error) })
     server.addEventListener('message', event => {
-      console.log(event.data)
+      // when receive bytes of replay file from client, parse and send `YgoProPacket` intervally.
+
+      const replayData = event.data as ArrayBuffer
+      const responses = getResponses(replayData)
+
+      const timeoutId = setInterval(() => {
+        const response = responses.pop()
+        if (response == null) {
+          // send response finished, close websocket
+          server.close()
+          clearInterval(timeoutId)
+          return
+        }
+
+        server.send(response)
+      }, 1000)
     })
 
     return new Response(null, {
