@@ -58,7 +58,7 @@ export default {
         }
 
         server.send(response)
-      }, 1000)
+      }, 100)
     })
 
     return new Response(null, {
