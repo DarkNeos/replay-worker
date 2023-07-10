@@ -51,8 +51,6 @@ export default {
       const timeoutId = setInterval(() => {
         const response = responses.shift()
         if (response == null) {
-          // send response finished, close websocket
-          server.close()
           clearInterval(timeoutId)
           return
         }
@@ -60,6 +58,8 @@ export default {
         server.send(response)
       }, 100)
     })
+
+    // TODO: set websocket timeout
 
     return new Response(null, {
       status: 101,
