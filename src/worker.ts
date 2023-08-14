@@ -52,6 +52,7 @@ export default {
         const response = responses.shift()
         if (response == null) {
           clearInterval(timeoutId)
+          server.close()
           return
         }
 
